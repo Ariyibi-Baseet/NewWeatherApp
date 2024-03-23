@@ -22,10 +22,6 @@ export default {
 </template>
 
 <style scoped>
-footer {
-  position: absolute;
-  bottom: 20px;
-}
 span {
   color: rgb(241, 41, 41);
 }
