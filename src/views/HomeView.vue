@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import FooterComp from '@/components/FooterComp.vue'
 import SearchBlock from '@/components/SearchBlock.vue'
 import { useWeatherStore } from '@/stores/weather'
+import errorImage from '@/assets/image/error-pics.png'
 // import { api } from '@/api/utils'
 export default {
   name: 'HomeView',
@@ -16,30 +17,40 @@ export default {
     const conditionImage = ref('')
     const humidity = ref('')
     const userInput = ref('')
+    const responseStatus = ref('')
     const weather = useWeatherStore()
     const isLoading = ref(false)
+    const isError = ref(false)
 
     const getUserData = async (data) => {
       isLoading.value = true
       userInput.value = data
-      try {
-        const response = await weather.getCurrentWeather(data)
-        if (response.status === 200) {
-          datas.value = response.data
-          name.value = datas.value.location.country
-          time.value = datas.value.location.localtime
-          temperature.value = `${datas.value.current.temp_c}°C`
-          condition.value = datas.value.current.condition.text
-          conditionImage.value = datas.value.current.condition.icon
-          humidity.value = datas.value.current.humidity
-        } else {
-          alert('Input field cannot be empty!!!')
+      if (userInput.value === '') {
+        isError.value = false
+        alert('City/Country Cannot be empty!!')
+      } else {
+        try {
+          const response = await weather.getCurrentWeather(data)
+          if (response.status === 200) {
+            responseStatus.value = response.status
+            isError.value = false
+            datas.value = response.data
+            name.value = datas.value.location.country
+            time.value = datas.value.location.localtime
+            temperature.value = `${datas.value.current.temp_c}°C`
+            condition.value = datas.value.current.condition.text
+            conditionImage.value = datas.value.current.condition.icon
+            humidity.value = datas.value.current.humidity
+          } else {
+            // alert('Input field cannot be empty!!!')
+            isLoading.value = true
+            isError.value = true
+          }
+        } catch (error) {
+          return error
+        } finally {
+          isLoading.value = false
         }
-      } catch (error) {
-        // console.log('The fucking Error', error.response.data.error.message)
-        return error
-      } finally {
-        isLoading.value = false
       }
     }
 
@@ -51,9 +62,12 @@ export default {
       conditionImage,
       humidity,
       userInput,
+      responseStatus,
       getUserData,
       datas,
-      isLoading
+      isLoading,
+      isError,
+      errorImage
     }
   }
 }
@@ -72,11 +86,19 @@ export default {
     <SearchBlock @userData="getUserData" />
     <!-- >>>>>>>>>>> Display weather informations here <<<<<<<<<<< -->
     <div class="show-weather-details">
-      <div class="empty-state" v-if="datas === ''">
+      <div class="empty-state" v-show="userInput === ''">
         <i class="bi bi-cloud-lightning-rain-fill"></i>
         <h3>Weather Information Shows right here</h3>
       </div>
-      <div class="weather-details" v-else>
+      <!-- <div
+        v-if="userInput === '' || userInput === null || userInput === undefined"
+        class="error-block"
+      > -->
+      <div v-if="isError" class="error-block">
+        <img :src="errorImage" alt="" class="error-pics" />
+        <p>Oops! The city/country is invalid!</p>
+      </div>
+      <div class="weather-details" v-if="responseStatus === 200">
         <div class="spinner-wrapper" v-if="isLoading">
           <ProgressSpinner />
         </div>
@@ -131,6 +153,24 @@ h3 > span:nth-child(2):not(.image) {
   border-radius: 8px;
   text-align: center;
   padding: 10px;
+}
+.error-block {
+  width: 400px;
+  margin-top: 30px;
+  box-shadow: 2px 3px 15px rgb(211, 201, 201);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  color: #fb745e;
+  font-weight: 500;
+  font-size: 20px;
+}
+.error-pics {
+  width: 100%;
+  width: 270px;
+  height: 270px;
+  display: block;
+  margin: auto;
 }
 .weather-details {
   width: 400px;
