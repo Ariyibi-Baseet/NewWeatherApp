@@ -17,22 +17,26 @@ export default {
     const conditionImage = ref('')
     const humidity = ref('')
     const userInput = ref('')
-    const responseStatus = ref('')
     const weather = useWeatherStore()
+    const weatherReport = ref(false)
+    const isDefaultBlock = ref(true)
     const isLoading = ref(false)
     const isError = ref(false)
 
     const getUserData = async (data) => {
       isLoading.value = true
+      isDefaultBlock.value = false
       userInput.value = data
       if (userInput.value === '') {
         isError.value = false
+        weatherReport.value = false
         alert('City/Country Cannot be empty!!')
       } else {
         try {
           const response = await weather.getCurrentWeather(data)
           if (response.status === 200) {
-            responseStatus.value = response.status
+            weatherReport.value = true
+
             isError.value = false
             datas.value = response.data
             name.value = datas.value.location.country
@@ -41,13 +45,18 @@ export default {
             condition.value = datas.value.current.condition.text
             conditionImage.value = datas.value.current.condition.icon
             humidity.value = datas.value.current.humidity
+          } else if (weather.errMessage.message === 'No matching location found.') {
+            isError.value = true
+            isDefaultBlock.value = false
           } else {
-            // alert('Input field cannot be empty!!!')
             isLoading.value = true
             isError.value = true
           }
         } catch (error) {
-          return error
+          // return error
+          console('Hello')
+          console.log(error)
+          // throw new Exception()
         } finally {
           isLoading.value = false
         }
@@ -62,10 +71,11 @@ export default {
       conditionImage,
       humidity,
       userInput,
-      responseStatus,
+      weatherReport,
       getUserData,
       datas,
       isLoading,
+      isDefaultBlock,
       isError,
       errorImage
     }
@@ -86,7 +96,7 @@ export default {
     <SearchBlock @userData="getUserData" />
     <!-- >>>>>>>>>>> Display weather informations here <<<<<<<<<<< -->
     <div class="show-weather-details">
-      <div class="empty-state" v-show="userInput === ''">
+      <div class="empty-state" v-show="isDefaultBlock || userInput === ''">
         <i class="bi bi-cloud-lightning-rain-fill"></i>
         <h3>Weather Information Shows right here</h3>
       </div>
@@ -98,7 +108,7 @@ export default {
         <img :src="errorImage" alt="" class="error-pics" />
         <p>Oops! The city/country is invalid!</p>
       </div>
-      <div class="weather-details" v-if="responseStatus === 200">
+      <div class="weather-details" v-if="weatherReport">
         <div class="spinner-wrapper" v-if="isLoading">
           <ProgressSpinner />
         </div>
