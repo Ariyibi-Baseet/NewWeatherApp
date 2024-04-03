@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-// import { api, apiKey } from '@/api/utils'
+import { api, apiKey } from '@/api/utils'
 import { ref } from 'vue'
 
 export const useWeatherStore = defineStore('weather', () => {
   const errMessage = ref('')
 
-  const api = import.meta.env.VITE_BASE_URL
-  const apiKey = import.meta.env.VITE_API_KEY
+  // const api = import.meta.env.VITE_BASE_URL
+  // const apiKey = import.meta.env.VITE_API_KEY
 
   const getCurrentWeather = async (city) => {
     try {
