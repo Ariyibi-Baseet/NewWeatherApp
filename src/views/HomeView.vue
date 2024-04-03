@@ -53,10 +53,7 @@ export default {
             isError.value = true
           }
         } catch (error) {
-          // return error
-          console('Hello')
-          console.log(error)
-          // throw new Exception()
+          return error
         } finally {
           isLoading.value = false
         }
@@ -100,10 +97,6 @@ export default {
         <i class="bi bi-cloud-lightning-rain-fill"></i>
         <h3>Weather Information Shows right here</h3>
       </div>
-      <!-- <div
-        v-if="userInput === '' || userInput === null || userInput === undefined"
-        class="error-block"
-      > -->
       <div v-if="isError" class="error-block">
         <img :src="errorImage" alt="" class="error-pics" />
         <p>Oops! The city/country is invalid!</p>
