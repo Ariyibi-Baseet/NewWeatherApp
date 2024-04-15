@@ -10,7 +10,6 @@ import 'primevue/resources/themes/aura-light-green/theme.css'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import FloatLabel from 'primevue/floatlabel'
-import Chip from 'primevue/chip'
 import ProgressSpinner from 'primevue/progressspinner'
 
 import App from './App.vue'
@@ -21,10 +20,10 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 app.use(PrimeVue)
+// eslint-disable-next-line vue/no-reserved-component-names
 app.component('Button', Button)
 app.component('InputText', InputText)
 app.component('FloatLabel', FloatLabel)
-app.component('Chip', Chip)
 app.component('ProgressSpinner', ProgressSpinner)
 
 app.mount('#app')

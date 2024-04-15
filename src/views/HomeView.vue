@@ -32,6 +32,7 @@ export default {
         weatherReport.value = false
         alert('City/Country Cannot be empty!!')
       } else {
+        isLoading.value = true
         try {
           const response = await weather.getCurrentWeather(data)
           if (response.status === 200) {
@@ -46,6 +47,8 @@ export default {
             conditionImage.value = datas.value.current.condition.icon
             humidity.value = datas.value.current.humidity
           } else if (weather.errMessage.message === 'No matching location found.') {
+            isLoading.value = true
+            weatherReport.value = false
             isError.value = true
             isDefaultBlock.value = false
           } else {
@@ -82,13 +85,6 @@ export default {
 
 <template>
   <main>
-    <Chip class="py-0 pl-0 pr-3">
-      <span
-        class="bg-primary border-circle w-2rem h-2rem flex align-items-center justify-content-center"
-        >P</span
-      >
-      <span class="ml-2 font-medium">PRIME</span>
-    </Chip>
     <h1>Weather <i class="pi pi-sun"></i> App using <span class="inline-clr">Prime Vue</span></h1>
     <SearchBlock @userData="getUserData" />
     <!-- >>>>>>>>>>> Display weather informations here <<<<<<<<<<< -->
@@ -100,6 +96,9 @@ export default {
       <div v-if="isError" class="error-block">
         <img :src="errorImage" alt="" class="error-pics" />
         <p>Oops! The city/country is invalid!</p>
+        <div class="spinner-wrapper" v-if="isLoading">
+          <ProgressSpinner />
+        </div>
       </div>
       <div class="weather-details" v-if="weatherReport">
         <div class="spinner-wrapper" v-if="isLoading">
@@ -167,6 +166,7 @@ h3 > span:nth-child(2):not(.image) {
   color: #fb745e;
   font-weight: 500;
   font-size: 20px;
+  position: relative;
 }
 .error-pics {
   width: 100%;
